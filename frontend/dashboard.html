@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodDash | Analytics Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-container {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            overflow-y: auto;
+        }
+        .chart-card {
+            background-color: var(--bg-panel);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <nav class="top-nav">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <h1>FoodDash <span class="logo-subtitle">Analytics</span></h1>
+            </div>
+            <div>
+                <a href="index.html" style="color: var(--accent-cyan); text-decoration: none; font-size: 14px;">← Back to Map</a>
+            </div>
+        </nav>
+        <div class="dashboard-container">
+            <div class="chart-card">
+                <h2>Model Accuracy metrics</h2>
+                <p style="color: var(--text-muted); margin-top: 10px;">Mean Absolute Error (MAE): <span style="color: var(--success); font-weight: bold; font-family: var(--font-data);">8.04 mins</span></p>
+                <p style="color: var(--text-muted); margin-top: 5px;">This means the model's predictions are on average within 8 minutes of the actual delivery time.</p>
+            </div>
+            <div class="chart-card">
+                <h2>Feature Importance</h2>
+                <ul class="impact-list" style="margin-top: 15px;">
+                    <li><span>Distance (km)</span> <span style="color: var(--accent-cyan);">High Impact</span></li>
+                    <li><span>Traffic Density</span> <span style="color: var(--danger);">High Impact</span></li>
+                    <li><span>Weather Conditions</span> <span style="color: var(--accent-purple);">Medium Impact</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
