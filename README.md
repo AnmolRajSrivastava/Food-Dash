@@ -2,7 +2,7 @@
 
 > **AI-Powered Delivery ETA Prediction & Predictive Logistics Hub**
 
-Live Demo: food-dash-iota-lime.vercel.app
+Live Demo: [food-dash-iota-lime.vercel.app](https://food-dash-iota-lime.vercel.app)
 
 ---
 
