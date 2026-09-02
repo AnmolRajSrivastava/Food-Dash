@@ -16,11 +16,11 @@ function initMap() {
         zoomControl: false
     }).setView([19.0760, 72.8777], 12);
 
-    // Add CartoDB Positron base layer (looks great inverted in CSS for dark mode)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
+    // Add OpenStreetMap base layer (completely free, no API key, no watermarks)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        subdomains: 'abc',
+        maxZoom: 19
     }).addTo(map);
 
     // Move zoom control to top right
