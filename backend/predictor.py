@@ -8,6 +8,10 @@ class DeliveryPredictor:
         model_path = os.path.join(base_dir, '..', 'model', 'model.pkl')
         encoders_path = os.path.join(base_dir, '..', 'model', 'preprocessor.pkl')
         
+        if not os.path.exists(model_path):
+            model_path = os.path.join(base_dir, 'model', 'model.pkl')
+            encoders_path = os.path.join(base_dir, 'model', 'preprocessor.pkl')
+        
         try:
             with open(model_path, 'rb') as f:
                 self.model = pickle.load(f)

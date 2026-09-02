@@ -1,6 +1,11 @@
 // OpenRouteService API Key
 const ORS_API_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjMzMzA1MjBkZWNmMDQ5MWI5Yzk1MGIzNTQ1NDI0NTYwIiwiaCI6Im11cm11cjY0In0=';
 
+// Backend API URL: automatically switches between local and cloud production URL
+const API_BASE_URL = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' || window.location.protocol === 'file:')
+    ? 'http://127.0.0.1:5000'
+    : 'https://food-dash-backend.onrender.com'; // Set to your live Render backend URL
+
 // Metro Hub Configuration
 const METRO_HUBS = {
     mumbai: {
@@ -380,7 +385,7 @@ async function runPrediction() {
     const weather = document.getElementById('weather-select').value;
 
     try {
-        const response = await fetch('http://127.0.0.1:5000/predict', {
+        const response = await fetch(`${API_BASE_URL}/predict`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -425,7 +430,10 @@ async function runPrediction() {
 
     } catch (err) {
         console.error("Prediction Error:", err);
-        showCustomAlert("Backend Service Unreachable. Ensure Flask is running on port 5000.");
+        const errorMsg = (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? "Backend Service Unreachable. Ensure Python Flask is running on port 5000."
+            : "Cloud backend starting up or unreachable. Please allow ~30s for spin-up if inactive.";
+        showCustomAlert(errorMsg);
     } finally {
         btn.innerHTML = originalContent;
         btn.style.opacity = '1';
