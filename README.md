@@ -54,9 +54,14 @@ Live Demo: [Deploying today](https://vercel.com) *(Update with your Vercel URL)*
   - Blends trained machine learning pattern recognition with real-world physical transit constraints.
   - Delivers instant, deterministic ETA predictions in minutes.
 
-- **Granular Telemetry & Impact Breakdown**:
-  - Deconstructs total predicted time into **Base Distance Transit Time**, **Traffic Delay Penalty**, and **Weather Delay Penalty**.
-  - Dynamic **Confidence Level Meter** calculated from environmental volatility and transit distance.
+- **Distance-Compounded Weather & Traffic Penalty Engine**:
+  - Predicts real-world delivery delays by decomposing total delivery time into a **Physics Base Transit Time** and dynamic **Weather & Traffic Delay Penalties**.
+  - Rather than applying a naive flat delay, penalties scale proportionally with travel distance: bad weather and gridlock compound significantly the further the driver travels.
+  - **Live Telemetry Output**:
+    - **Base Distance Time**: Physical preparation and transit floor ($10\text{ mins prep} + 2\text{ mins/km}$).
+    - **Traffic Penalty**: Congestion delay calculated from traffic density (Low $\rightarrow$ Med $\rightarrow$ High $\rightarrow$ Jam).
+    - **Weather Penalty**: Adverse condition delay derived from weather severity (Sunny $\rightarrow$ Cloudy $\rightarrow$ Rainy $\rightarrow$ Stormy).
+    - **Confidence Score**: Dynamic confidence percentage that decreases under high environmental volatility and extreme distances.
 
 - **Operational Boundary Guard**:
   - Automated distance validator that detects if a selected dropoff point exceeds the maximum 100km urban operational limit, triggering an animated on-screen warning alert.
@@ -68,12 +73,16 @@ Live Demo: [Deploying today](https://vercel.com) *(Update with your Vercel URL)*
 
 ## What I learned / Optimization
 
-### 1. Solving the Random Forest Extrapolation Limit (Hybrid ML / Physics Architecture)
-* **The Problem**: Tree-based ensembles like Random Forest cannot extrapolate values outside the numerical range of their training set (in this dataset, delivery trips were typically $\le$ 20km). When tested on long-distance routes (e.g., 60–80km), the model plateaued and returned an inaccurate ceiling of ~45 minutes.
-* **The Solution**: Developed a hybrid architecture in `predictor.py`. The machine learning model is queried at a standardized baseline distance (10km) under current weather and traffic conditions to isolate the non-linear **environmental penalty multiplier**. This learned multiplier is then mathematically applied to a physical base transit equation:
+### 1. Distance-Scaled Environmental Penalties (Solving Random Forest Extrapolation)
+* **The Core Insight**: In real-world food logistics, environmental friction (weather and traffic) is **distance-dependent**. A severe rainstorm or traffic jam causes a mild 3-minute delay on a 1.5km trip, but compounds into an exponential 20–30 minute delay across a 25km cross-city journey.
+* **The Problem**: Tree-based ensembles like Random Forest cannot extrapolate values outside the numerical range of their training set (in this dataset, delivery trips were capped under 20km). When queried on long-distance trips (e.g., 40–80km), the model plateaued and returned an inaccurate ceiling of ~45 minutes.
+* **The Solution**: Developed a hybrid architecture in `predictor.py`. The machine learning model is queried at a standardized baseline distance (10km) under current weather and traffic conditions to extract the non-linear **penalty multiplier**:
+  $$\text{Penalty Multiplier} = \frac{\text{Model Predicted Time at 10km (Current Conditions)}}{\text{Model Predicted Time at 10km (Sunny + Low Traffic)}}$$
   $$\text{Base Time} = 10\text{ mins (kitchen preparation)} + (\text{Distance in km} \times 2\text{ mins/km})$$
   $$\text{Predicted ETA} = \text{Base Time} \times \max(1.0, \text{Penalty Multiplier})$$
-  This allows the system to scale realistically to any distance while preserving the complex penalties learned by the Random Forest.
+  $$\text{Total Penalty} = \text{Predicted ETA} - \text{Base Time}$$
+  $$\text{Weather Delay} = \text{Total Penalty} \times 40\% \quad\Big|\quad \text{Traffic Delay} = \text{Total Penalty} \times 60\%$$
+  This ensures penalties scale realistically across any route distance while preserving the complex non-linear relationships learned by the Random Forest.
 
 ### 2. Guarding Against Real-World Dataset Noise
 * **The Problem**: Real-world delivery records often contain noise or anomalies where a "Sunny" trip took longer than a "Stormy" trip due to unmeasured events (e.g., kitchen delays), occasionally causing the model to output a penalty multiplier $< 1.0$.
